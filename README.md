@@ -21,7 +21,7 @@ A key feature of this dataset is its division into two interaction matrices (see
 - **Large matrix**: A sparse matrix with a density of approximately **16.3%**, resembling real-world data where users interact with only a small fraction of items.
 - **Small matrix**: A dense matrix with a density of around **99.6%**, providing a near-complete view of user preferences.
 
-![kuaiRec](./data_final_project/KuaiRec%202.0/figs/KuaiRec.png)
+![kuaiRec](./img/KuaiRec.png)
 
 ---
 
@@ -50,8 +50,6 @@ In this project, I employed the following evaluation metrics to assess the perfo
   - **MRR**: Measures the average rank of relevant items among the recommended items.
   - **NDCG**: Measures the relevance of recommended items, accounting for their position.
 
-**Note**: For the Collaborative Filtering model, I utilized only MAE and RMSE metrics, as it predicts `watch_ratio`. Other models were evaluated using all metrics due to their focus on predicting item relevance.
-
 ## Recommendation System
 ### Collaborative Filtering
 
@@ -62,8 +60,17 @@ An alternative least squares (ALS) algorithm has been implemented to learn the l
 The result after some hyperparameter tuning has the following results:
 | Metric       | Value |
 |--------------|-------|
-|(RMSE)        | 0.5518|                              
-|(MAE)         | 0.3170|                             
+|(RMSE)        | 0.5518|
+|(MAE)         | 0.3170|
 |Precision@20  | 0.2322|
 |Hit Rate at 20| 1.0000|
 |MRR@20        | 0.9634|
+
+For the error-base metrics, they indicate a reasonably low level of prediction error, suggesting the model is accurately estimating user-item ratings.
+
+As of the accuracy-based metrics. The high `Hit Rate` and `MRR` scores demonstrate that the recommender consistently places relevant items within the top-20 recommendations. A `Hit Rate` of **1.0000** means that at least one relevant item is always present in the top-20 list, and the `MRR` of **0.9634** reflects that relevant items tend to be ranked very highly. `Precision@20` shows that roughly **23%** of the top-20 items are relevant, indicating solid relevance density.
+
+Overall, these results suggest that the tuned ALS model performs well for both rating prediction and top-N recommendation tasks, making it effective for personalized recommendation scenarios but as we have other datasets, portraying meta-data of the users and items, we may be able to improve the model by adding more features to it.
+
+### Content-Based Filtering
+Content-based filtering is a recommendation technique that relies on the features of items and users to make predictions. In this project, I implemented a content-based filtering model using the `XGBoost` algorithm, which is a powerful gradient boosting framework.
