@@ -63,7 +63,7 @@ The result after some hyperparameter tuning has the following results:
 |(RMSE)        | 0.5518|
 |(MAE)         | 0.3170|
 |Precision@20  | 0.2322|
-|Hit Rate at 20| 1.0000|
+|Hit Rate@20   | 1.0000|
 |MRR@20        | 0.9634|
 
 For the error-base metrics, they indicate a reasonably low level of prediction error, suggesting the model is accurately estimating user-item ratings.
