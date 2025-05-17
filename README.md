@@ -1,5 +1,5 @@
 # KuaiRec by **Samy YACEF**
-This report is a summary of my work on the KuaiRec project, which is a recommendation system for a video streaming platform. In this report, I will NOT discuss the data analysis of the different dataset that I used as they have their own Notebooks (Check the `./notebook/` folder for more informations on this).
+This report is a summary of my work on the KuaiRec project, which is a recommendation system for a video streaming platform. In this report, I will NOT discuss the data analysis of the different dataset that I used as they have their own Notebooks (Check the `./notebook/EDA` folder for more informations on this).
 
 Instead, I will focus on the recommendation system itself and the different models that I implemented and explain my choices. I will also discuss the evaluation metrics that I used to measure the performance of the models and the results that I obtained.
 
@@ -117,10 +117,19 @@ The error-based metrics are well above the ones obtained with the collaborative 
 The accuracy-based metrics are better than the ones obtained with the pointwise ranking model. The `Precision@20` is still low, but the `Hit Rate@20` and `MRR@20` are still high, indicating that the model is able to recommend at least one relevant item in the top-20 list. The `NDCG@20` is also a good indicator of the relevance of the recommended items, indicating that the model is able to recommend relevant items in the top-20 list.
 
 ## Conclusion
-In this report, I presented the different models that I implemented for the KuaiRec project. I started with a collaborative filtering model based on ALS, which served as a baseline recommendation system. I then implemented two content-based filtering models using `XGBoost`, one based on pointwise ranking and the other based on listwise ranking.
 
-The results of the models were evaluated using different metrics, and I discussed the strengths and weaknesses of each model. Overall, the collaborative filtering model performed well for both rating prediction and top-N recommendation tasks, while the content-based filtering models showed promise but required further tuning to improve their performance.
+In this report, I presented various models developed for the KuaiRec project. Initially, a collaborative filtering model using ALS was implemented as a baseline recommendation system. Following this, two content-based filtering models utilizing `XGBoost` were introduced: one employing pointwise ranking and another employing listwise ranking strategies.
 
-I have re-evaluated the ALS model with more recommendations based on the top-100 items recommandation instead of top-20 and the precision is now **0.3218** and the other metrics are still the same.
+**Model Evaluations and Insights:**
+- The collaborative filtering model demonstrated robust performance in both rating prediction and top-N recommendation tasks.
+- Content-based filtering models showed potential but required additional tuning to enhance performance metrics.
 
-A more advanced model could be implemented by combining the collaborative filtering and content-based filtering models, which would allow us to leverage the strengths of both approaches. However, as the content-based models were performing poorly, I decided to stop at this stage. An other interesting approch would be to use an engagement score instead of the `watch_ratio` to predict the user-item interactions. This would allow us to take into account more features of the interactions
+**Recent Developments:**
+- The ALS model was re-evaluated with extended recommendations (top-100 items), resulting in a precision of **0.3218**, while other metrics remained unchanged.
+- An advanced model combining collaborative and content-based filtering approaches was considered but postponed due to suboptimal performance of content-based models.
+
+**Future Directions:**
+- Exploring an engagement score approach instead of `watch_ratio` to predict user-item interactions is proposed. This approach aims to leverage additional interaction features for improved recommendation accuracy.
+
+Overall, while collaborative filtering proved effective, further enhancements and alternative approaches are can be implemented to optimize recommendation quality for the KuaiRec project.
+
