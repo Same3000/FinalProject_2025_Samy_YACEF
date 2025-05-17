@@ -1,4 +1,4 @@
-# KuaiRec
+# KuaiRec by **Samy YACEF**
 This report is a summary of my work on the KuaiRec project, which is a recommendation system for a video streaming platform. In this report, I will NOT discuss the data analysis of the different dataset that I used as they have their own Notebooks (Check the `./notebook/` folder for more informations on this).
 
 Instead, I will focus on the recommendation system itself and the different models that I implemented and explain my choices. I will also discuss the evaluation metrics that I used to measure the performance of the models and the results that I obtained.
@@ -73,4 +73,54 @@ As of the accuracy-based metrics. The high `Hit Rate` and `MRR` scores demonstra
 Overall, these results suggest that the tuned ALS model performs well for both rating prediction and top-N recommendation tasks, making it effective for personalized recommendation scenarios but as we have other datasets, portraying meta-data of the users and items, we may be able to improve the model by adding more features to it.
 
 ### Content-Based Filtering
-Content-based filtering is a recommendation technique that relies on the features of items and users to make predictions. In this project, I implemented a content-based filtering model using the `XGBoost` algorithm, which is a powerful gradient boosting framework.
+
+Content-based filtering is a recommendation technique that relies on the features of items to make predictions. In this project, I implemented content-based filtering models using the `XGBoost` library. 
+
+A Data Analysis was performed to determine the most relevant features to use for the following models, you can find the details in the `./notebooks/EDA_user_behaviour.ipynb` notebook.
+
+#### Pointwise Ranking Model
+The first implementation was based on the prediction of the `watch_ratio` of the each item separately. This implemetation is a pointwise ranking model, which means that it predicts the `watch_ratio` of each item for each user.
+
+After some fine-tuning of the hyperparameters, the model achieved the following results:
+
+| Metric       | Value |
+|--------------|-------|
+|RMSE          | 0.5750|
+|MAE           | 0.4076|
+|Precision@20  | 0.0386|
+|Hit Rate@20   | 1.0000|
+|MRR@20        | 0.9185|
+
+The error-based metrics are above the ones obtained with the collaborative filtering model, indicating a higher level of prediction error but overall, the model is still able to predict the `watch_ratio` of the items with a reasonable accuracy.
+
+However, the accuracy-based metrics are not as good as the ones obtained with the collaborative filtering model. The `Precision@20` is very low, indicating that the model is not able to recommend relevant items to the users. The `Hit Rate@20` and `MRR@20` are still high, indicating that the model is able to recommend at least one relevant item in the top-20 list but the relevance density is very low.
+
+
+#### Listwise Ranking Model
+For the second implementation of the content-based filtering model, I used `XGRanker` of the library `XGBoost` to implement a listwise approach. This is a gradient boosting model that is specifically designed for ranking tasks.
+
+The `XGBRanker` model was trained using the same features as the previous model, unlike pointwise ranking models, listwise ranking models take into account the entire list of items when making predictions. This allows the model to learn the relative importance of each item in the list and to optimize the ranking of the items.
+
+After some fine-tuning of the hyperparameters, the model achieved the following results:
+
+| Metric       | Value |
+|--------------|-------|
+|RMSE          | 1.3426|
+|MAE           | 1.2025|
+|Precision@20  | 0.0415|
+|Hit Rate@20   | 1.0000|
+|MRR@20        | 0.9431|
+|NDCG@20       | 0.3314|
+
+The error-based metrics are well above the ones obtained with the collaborative filtering model, indicating a higher level of prediction error but as our model is a listwise ranking model, we should not focus on these metrics.
+
+The accuracy-based metrics are better than the ones obtained with the pointwise ranking model. The `Precision@20` is still low, but the `Hit Rate@20` and `MRR@20` are still high, indicating that the model is able to recommend at least one relevant item in the top-20 list. The `NDCG@20` is also a good indicator of the relevance of the recommended items, indicating that the model is able to recommend relevant items in the top-20 list.
+
+## Conclusion
+In this report, I presented the different models that I implemented for the KuaiRec project. I started with a collaborative filtering model based on ALS, which served as a baseline recommendation system. I then implemented two content-based filtering models using `XGBoost`, one based on pointwise ranking and the other based on listwise ranking.
+
+The results of the models were evaluated using different metrics, and I discussed the strengths and weaknesses of each model. Overall, the collaborative filtering model performed well for both rating prediction and top-N recommendation tasks, while the content-based filtering models showed promise but required further tuning to improve their performance.
+
+I have re-evaluated the ALS model with more recommendations based on the top-100 items recommandation instead of top-20 and the precision is now **0.3218** and the other metrics are still the same.
+
+A more advanced model could be implemented by combining the collaborative filtering and content-based filtering models, which would allow us to leverage the strengths of both approaches. However, as the content-based models were performing poorly, I decided to stop at this stage. An other interesting approch would be to use an engagement score instead of the `watch_ratio` to predict the user-item interactions. This would allow us to take into account more features of the interactions
