@@ -65,6 +65,7 @@ The result after some hyperparameter tuning has the following results:
 |Precision@20  | 0.2322|
 |Hit Rate@20   | 1.0000|
 |MRR@20        | 0.9634|
+|NDCG@20       | 0.5732|
 
 For the error-base metrics, they indicate a reasonably low level of prediction error, suggesting the model is accurately estimating user-item ratings.
 
@@ -90,11 +91,13 @@ After some fine-tuning of the hyperparameters, the model achieved the following 
 |Precision@20  | 0.0386|
 |Hit Rate@20   | 1.0000|
 |MRR@20        | 0.9185|
+|NDCG@20       | 0.8125|
 
 The error-based metrics are above the ones obtained with the collaborative filtering model, indicating a higher level of prediction error but overall, the model is still able to predict the `watch_ratio` of the items with a reasonable accuracy.
 
-However, the accuracy-based metrics are not as good as the ones obtained with the collaborative filtering model. The `Precision@20` is very low, indicating that the model is not able to recommend relevant items to the users. The `Hit Rate@20` and `MRR@20` are still high, indicating that the model is able to recommend at least one relevant item in the top-20 list but the relevance density is very low.
+However, the accuracy-based metrics are not as good as the ones obtained with the collaborative filtering model. The `Precision@20` is very low, indicating that the model is not able to recommend relevant items to the users. The `Hit Rate@20`, `MRR@20` and `NDCG@20` are still high, indicating that the model is able to recommend at least one relevant item in the top-20 list but the relevance density is very low.
 
+After testing with a higher k value (top-100 items), the `Precision@100` was **0.1311** and the `NDCG@100` was **0.6813**, indicating that the model is able to recommend more relevant items in the top-100 list but the relevance density is still relatively low. 
 
 #### Listwise Ranking Model
 For the second implementation of the content-based filtering model, I used `XGRanker` of the library `XGBoost` to implement a listwise approach. This is a gradient boosting model that is specifically designed for ranking tasks.
@@ -125,7 +128,7 @@ In this report, I presented various models developed for the KuaiRec project. In
 - Content-based filtering models showed potential but required additional tuning to enhance performance metrics.
 
 **Recent Developments:**
-- The ALS model was re-evaluated with extended recommendations (top-100 items), resulting in a precision of **0.3218**, while other metrics remained unchanged.
+- The ALS model was re-evaluated with extended recommendations (top-100 items), resulting in a precision of **0.3218** and a ndcg of **0.6117**, while other metrics remained unchanged.
 - An advanced model combining collaborative and content-based filtering approaches was considered but postponed due to suboptimal performance of content-based models.
 
 **Future Directions:**

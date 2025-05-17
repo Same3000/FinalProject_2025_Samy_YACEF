@@ -8,3 +8,4 @@ pyspark
 xgboost
 scikit-learn
 tqdm
+setuptools

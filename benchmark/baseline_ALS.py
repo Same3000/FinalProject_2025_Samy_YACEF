@@ -127,6 +127,59 @@ def evaluate_als_mrr(test_df, predictions, k=10, rating_col="watch_ratio", user_
     mrr = total_sum_of_reciprocal_ranks / num_users_for_mrr_denominator
     print(f"MRR at {k}: {mrr:.4f}")
 
+def evaluate_als_ndcg(test_df, predictions, k=10, rating_col="watch_ratio", user_col="userIndex", item_col="videoIndex"):
+    window_spec_pred = Window.partitionBy(user_col).orderBy(col("prediction").desc())
+    ranked_predictions = predictions.withColumn("rank", row_number().over(window_spec_pred))
+
+    top_k_predictions = ranked_predictions.filter(col("rank") <= k)
+
+    user_item_relevance = top_k_predictions.join(
+        test_df.select(user_col, item_col, col(rating_col).alias("relevance")),
+        on=[user_col, item_col],
+        how="left"
+    ).fillna(0, subset=["relevance"])
+
+    user_item_relevance = user_item_relevance.withColumn(
+        "dcg_term",
+        col("relevance") / expr(f"log2(rank + 1)")
+    )
+    dcg_per_user = user_item_relevance.groupBy(user_col).agg(
+        sum("dcg_term").alias("dcg")
+    )
+
+    window_spec_true = Window.partitionBy(user_col).orderBy(col(rating_col).desc())
+    ranked_true_items = test_df.withColumn("true_rank", row_number().over(window_spec_true))
+
+    top_k_true_items = ranked_true_items.filter(col("true_rank") <= k)
+
+    top_k_true_items = top_k_true_items.withColumn(
+        "idcg_term",
+        col(rating_col) / expr(f"log2(true_rank + 1)")
+    )
+    idcg_per_user = top_k_true_items.groupBy(user_col).agg(
+        sum("idcg_term").alias("idcg")
+    )
+
+    ndcg_data = dcg_per_user.join(idcg_per_user, on=user_col, how="left").fillna(0, subset=["idcg"])
+
+    ndcg_data = ndcg_data.withColumn(
+        "ndcg",
+        when(col("idcg") == 0, 0.0).otherwise(col("dcg") / col("idcg"))
+    )
+
+    num_users_for_ndcg = ndcg_data.count()
+    if num_users_for_ndcg == 0:
+        print(f"NDCG at {k}: 0.0000 (No users with recommendations or relevant items to calculate NDCG)")
+        return
+
+    avg_ndcg_result = ndcg_data.agg(sum("ndcg")).first()
+    if avg_ndcg_result is None or avg_ndcg_result[0] is None:
+        avg_ndcg = 0.0
+    else:
+        avg_ndcg = avg_ndcg_result[0] / num_users_for_ndcg
+    
+    print(f"NDCG at {k}: {avg_ndcg:.4f}")
+
 def main():
     spark = SparkSession.builder \
     .appName("KuaiRec_ALS_Model") \
@@ -163,9 +216,10 @@ def main():
             return
         k = 100
         evaluate_regression(predictions)
-        evaluate_als_precision(test, predictions, k)
-        evaluate_als_hit_rate(test, predictions, k)
-        evaluate_als_mrr(test, predictions, k)
+        evaluate_als_ndcg(test, predictions, k)
+        #evaluate_als_precision(test, predictions, k)
+        #evaluate_als_hit_rate(test, predictions, k)
+        #evaluate_als_mrr(test, predictions, k)
     except Exception as e:
         print(f"Error during model training or evaluation: {e}")
         import traceback
